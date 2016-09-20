@@ -1,0 +1,33 @@
+{
+  "name": "eleven",
+  "version": "0.1.0",
+  "description": "A command line tool that aims to make interacting with AWS's serverless primitives less sucky.",
+  "main": "index.js",
+  "bin": "index.js",
+  "preferGlobal": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "cli",
+    "node",
+    "aws",
+    "lambda"
+  ],
+  "author": "Adam Simpson",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.6.1",
+    "globby": "^6.0.0",
+    "shelljs": "^0.7.4",
+    "vorpal": "^1.11.4"
+  },
+  "devDependencies": {
+    "eslint": "^3.5.0",
+    "eslint-config-airbnb": "^11.1.0",
+    "eslint-config-sparkbox": "^0.1.0",
+    "eslint-plugin-import": "^1.14.0",
+    "eslint-plugin-jsx-a11y": "^2.2.2",
+    "eslint-plugin-react": "^6.2.1"
+  }
+}
