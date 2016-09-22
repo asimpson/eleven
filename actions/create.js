@@ -12,6 +12,11 @@ const s3 = new aws.S3();
 const prompts = [
   {
     type: 'input',
+    name: 'bucket',
+    message: 'What is the Bucket name? ',
+  },
+  {
+    type: 'input',
     name: 'arn',
     message: 'What is the Role string for this function? ',
   },
@@ -39,15 +44,15 @@ const upload = (bucket, file) => {
 
 const createLambda = (args, cb) => {
   const fileName = path.basename(args.file, '.js');
-  const name = args.options.n ? args.options.n : fileName;
+  const name = args.options.n || fileName;
   const params = {
     Code: {
-      S3Bucket: args.options.b,
+      S3Bucket: args.bucket,
       S3Key: args.options.k,
     },
     FunctionName: name,
     Handler: `${name}.handler`,
-    Role: args.arn || args.options.r,
+    Role: args.arn,
     Runtime: 'nodejs4.3',
     Publish: true,
   };
@@ -58,29 +63,31 @@ const createLambda = (args, cb) => {
   });
 };
 
+const process = (args, cb) => {
+  const newArgs = args;
+  const fileName = path.basename(args.file, '.js');
+  newArgs.options.k = `${fileName}.zip`;
+  shell.exec(`cp ${args.file} ${path.basename(args.file)}`, { silent: true });
+  vorpal.session.log('preparing for upload...');
+  shell.exec(`zip -r ${fileName}.zip ${path.basename(args.file)} node_modules`, { silent: true });
+  upload(newArgs.bucket, newArgs.options.k)
+  .then(() => createLambda(newArgs, cb));
+};
+
 const create = (args, cb) => {
-  vorpal.session.prompt(prompts)
-  .then(x => {
-    Object.assign(args, x);
-    if (!args.options.k) {
-      shell.exec(`cp ${args.file} ${path.basename(args.file)}`, { silent: true });
-      vorpal.session.log('preparing for upload...');
-      shell.exec(`zip -r ${path.basename(args.file, '.js')}.zip ${path.basename(args.file)} node_modules`, { silent: true });
-      args.options.k = `${path.basename(args.file, '.js')}.zip`;
-      upload(args.options.b, args.options.k)
-      .then(() => createLambda(args, cb));
-    } else {
-      createLambda(args, cb);
-    }
-  });
+  if (!args.options.b) {
+    vorpal.session.prompt(prompts)
+    .then(x => process(Object.assign(args, x), cb));
+  } else {
+    process(args, cb);
+  }
 };
 
 module.exports = function (vorpal) {
   vorpal
     .command('create [file]')
     .autocomplete(globby.sync('./**/*.js').filter(x => !/node_modules/.test(x)))
-    .option('-b <bucket>', 'AWS S3 Bucket name where the lambda zip file is')
-    .option('-k [key]', 'AWS S3 Bucket key (filename) of the zip file. Eleven will use this as the key if the zip file doesn\'t exist.')
+    .option('-b [bucket]', 'AWS S3 Bucket name where the lambda zip file is')
     .option('-n [name]', 'Override name')
     .description('Creates a new Lambda function.')
     .alias('new')
