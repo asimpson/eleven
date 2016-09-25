@@ -3,11 +3,11 @@ const path = require('path');
 const shell = require('shelljs');
 
 const zip = (vorpal, args, filename) => {
-  const file = args.file.length ? args.file[0] : args.file;
+  const file = args.file[0];
   return new Promise((resolve) => {
     let supportFiles = '';
 
-    if (args.file.length) {
+    if (args.file.length > 1) {
       supportFiles = args.file.filter((x, i) => i !== 0).reduce((p, c) => {
         return `${p} ${c}`;
       });

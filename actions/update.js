@@ -17,7 +17,7 @@ const prompts = [
 ];
 
 const updateLambda = (args, cb) => {
-  const file = args.file.length ? args.file[0] : args.file;
+  const file = args.file[0];
   const fileName = path.basename(file, '.js');
   const name = args.options.n || fileName;
   const params = {
@@ -34,7 +34,7 @@ const updateLambda = (args, cb) => {
 };
 
 const process = (args, cb) => {
-  const file = args.file.length ? args.file[0] : args.file;
+  const file = args.file[0];
   const newArgs = args;
   const fileName = path.basename(file, '.js');
   newArgs.options.k = `${fileName}.zip`;
