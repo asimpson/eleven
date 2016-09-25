@@ -17,7 +17,8 @@ const prompts = [
 ];
 
 const updateLambda = (args, cb) => {
-  const fileName = path.basename(args.file, '.js');
+  const file = args.file.length ? args.file[0] : args.file;
+  const fileName = path.basename(file, '.js');
   const name = args.options.n || fileName;
   const params = {
     S3Bucket: args.bucket,
@@ -33,8 +34,9 @@ const updateLambda = (args, cb) => {
 };
 
 const process = (args, cb) => {
+  const file = args.file.length ? args.file[0] : args.file;
   const newArgs = args;
-  const fileName = path.basename(args.file, '.js');
+  const fileName = path.basename(file, '.js');
   newArgs.options.k = `${fileName}.zip`;
   zip(vorpal, newArgs, fileName)
   .then(() => upload(vorpal, newArgs.bucket, newArgs.options.k))
@@ -52,7 +54,7 @@ const update = (args, cb) => {
 
 module.exports = function (vorpal) {
   vorpal
-    .command('update [file]')
+    .command('update [file...]')
     .autocomplete(globby.sync('./**/*.js').filter(x => !/node_modules/.test(x)))
     .option('-b [bucket]', 'AWS S3 Bucket name where the lambda zip file is')
     .option('-n [name]', 'Override name')
