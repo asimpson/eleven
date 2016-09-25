@@ -1,5 +1,6 @@
 'use strict';
 const vorpal = require('vorpal')();
+const vorpalFS = require('vorpal-autocomplete-fs');
 const aws = require('aws-sdk');
 const path = require('path');
 const globby = require('globby');
@@ -55,7 +56,7 @@ const update = (args, cb) => {
 module.exports = function (vorpal) {
   vorpal
     .command('update [file...]')
-    .autocomplete(globby.sync('./**/*.js').filter(x => !/node_modules/.test(x)))
+    .autocomplete(vorpalFS())
     .option('-b [bucket]', 'AWS S3 Bucket name where the lambda zip file is')
     .option('-n [name]', 'Override name')
     .description('Updates a Lambda function.')

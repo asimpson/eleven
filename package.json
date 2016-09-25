@@ -20,7 +20,8 @@
     "aws-sdk": "^2.6.1",
     "globby": "^6.0.0",
     "shelljs": "^0.7.4",
-    "vorpal": "^1.11.4"
+    "vorpal": "^1.11.4",
+    "vorpal-autocomplete-fs": "0.0.3"
   },
   "devDependencies": {
     "eslint": "^3.5.0",
