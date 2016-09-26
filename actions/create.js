@@ -1,5 +1,6 @@
 'use strict';
 const vorpal = require('vorpal')();
+const vorpalFS = require('vorpal-autocomplete-fs');
 const aws = require('aws-sdk');
 const path = require('path');
 const globby = require('globby');
@@ -23,7 +24,8 @@ const prompts = [
 ];
 
 const createLambda = (args, cb) => {
-  const fileName = path.basename(args.file, '.js');
+  const file = args.file[0];
+  const fileName = path.basename(file, '.js');
   const name = args.options.n || fileName;
   const params = {
     Code: {
@@ -44,8 +46,9 @@ const createLambda = (args, cb) => {
 };
 
 const process = (args, cb) => {
+  const file = args.file[0];
   const newArgs = args;
-  const fileName = path.basename(args.file, '.js');
+  const fileName = path.basename(file, '.js');
   newArgs.options.k = `${fileName}.zip`;
   zip(vorpal, newArgs, fileName)
   .then(() => upload(vorpal, newArgs.bucket, newArgs.options.k))
@@ -63,10 +66,8 @@ const create = (args, cb) => {
 
 module.exports = function (vorpal) {
   vorpal
-    .command('create [file]')
-    .autocomplete(globby.sync('./**/*.js').filter(x => !/node_modules/.test(x)))
-    .option('-b [bucket]', 'AWS S3 Bucket name where the lambda zip file is')
-    .option('-n [name]', 'Override name')
+    .command('create [file...]')
+    .autocomplete(vorpalFS())
     .description('Creates a new Lambda function.')
     .alias('new')
     .action(create)

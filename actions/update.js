@@ -57,8 +57,6 @@ module.exports = function (vorpal) {
   vorpal
     .command('update [file...]')
     .autocomplete(vorpalFS())
-    .option('-b [bucket]', 'AWS S3 Bucket name where the lambda zip file is')
-    .option('-n [name]', 'Override name')
     .description('Updates a Lambda function.')
     .alias('edit')
     .action(update)
